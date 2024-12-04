@@ -82,6 +82,7 @@ public class DriveTrain {
 
     public void go() {
         setPower(.1, .1, .1, .1);
+
     }
 
     public void initIMU(HardwareMap hwMap){
