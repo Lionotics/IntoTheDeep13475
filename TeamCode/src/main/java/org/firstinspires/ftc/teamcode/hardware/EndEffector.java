@@ -12,23 +12,25 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class EndEffector {
 
     public static double CLAW_CLOSE = 0, CLAW_OPEN = 0;
-    public static double ROTATE_UP = 0, ROTATE_DOWN = 0;
+    public static double ROTATE_UP = 0, ROTATE_DOWN = .75;
 
     Servo claw, wrist;
 
     public void init(HardwareMap hwMap) {
         claw = hwMap.get(Servo.class, "EEClaw");
         wrist = hwMap.get(Servo.class, "EEWrist");
-        rotateDown();
+        setWrist(.6);
         closeClaw();
     }
     private void setClaw(double pos) {
         claw.setPosition(pos);
     }
 
-    private void setWrist(double pos) {
-        wrist.setPosition(pos);
-    }
+    public double getClawPosition() {return claw.getPosition();}
+
+    private void setWrist(double pos) { wrist.setPosition(pos); }
+
+    public double getWristPosition() {return claw.getPosition();}
 
     public void close() {
         setClaw(CLAW_CLOSE);

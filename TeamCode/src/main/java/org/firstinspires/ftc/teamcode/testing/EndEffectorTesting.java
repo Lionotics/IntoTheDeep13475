@@ -11,27 +11,27 @@ import org.firstinspires.ftc.teamcode.helpers.GamepadEx;
 @TeleOp(name="End Effector Testing", group = "Testing")
 public class EndEffectorTesting extends LinearOpMode {
     Robot robot = Robot.getInstance();
-    GamepadEx gp1 = new GamepadEx();
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         robot.init(hardwareMap);
 
         waitForStart();
 
         while (opModeIsActive()) {
-            if (gp1.a.isCurrentlyPressed()) {
-                robot.ee.open();
-            } else {
-                robot.ee.close();
-            }
-            if (gp1.b.isCurrentlyPressed()) {
+            if (gamepad1.a) {
                 robot.ee.rotateUp();
-            } else {
+            } else if (gamepad1.b) {
                 robot.ee.rotateDown();
+            } else if (gamepad1.x) {
+                robot.ee.openClaw();
+            } else if (gamepad1.y) {
+                robot.ee.closeClaw();
             }
-            gp1.update(gamepad1);
+            telemetry.addData("EE Claw Position", robot.ee.getClawPosition());
+            telemetry.addData("EE Wrist Position", robot.ee.getWristPosition());
+            telemetry.update();
         }
-
     }
 }

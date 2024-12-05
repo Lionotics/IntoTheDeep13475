@@ -1,19 +1,9 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.internal.ui.ThemedActivity;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 @Config
 public class Intake {
@@ -22,46 +12,51 @@ public class Intake {
     CRServo wheelRight, wheelLeft;
     EndEffector ee;
 
-    public static double SHOULDER_RIGHT_UP = 0.5, SHOULDER_RIGHT_DOWN = 0.5;
-    public static double SHOULDER_LEFT_UP = 0.5, SHOULDER_LEFT_DOWN = 0.5;
+    public static double SHOULDER_UP = 0.4, SHOULDER_DOWN = 1;
     public boolean enableWheel = true;
 
-    private enum IntakeState {
+    public enum IntakeState {
         SPIN, LOCK, RAISE, TRANSFER, EJECT
     }
 
     public void init(HardwareMap hwMap) {
-        hwMap.get(Servo.class, "shoulderRight");
-        hwMap.get(Servo.class, "shoulderLeft");
-        hwMap.get(CRServo.class, "wheelRight");
-        hwMap.get(CRServo.class, "wheelLeft");
+        shoulderRight = hwMap.get(Servo.class, "shoulderRight");
+        shoulderLeft = hwMap.get(Servo.class, "shoulderLeft");
+        wheelRight = hwMap.get(CRServo.class, "wheelRight");
+        wheelLeft = hwMap.get(CRServo.class, "wheelLeft");
 
-        ee.init(hwMap);
+        ee = Robot.getInstance().ee;
 
-        setShoulderRight(SHOULDER_RIGHT_DOWN);
-        setShoulderLeft(SHOULDER_LEFT_DOWN);
+        setShoulders(SHOULDER_DOWN);
     }
 
-    private void setShoulderRight(double pos) {shoulderRight.setPosition(pos);}
+    public double getShoulderRightPosition() {return shoulderRight.getPosition();}
 
-    private void setShoulderLeft(double pos) {shoulderLeft.setPosition(pos);}
+    public double getShoulderLeftPosition() {return shoulderRight.getPosition();}
 
-    private void setWheelRight(double power) {wheelRight.setPower(power);}
+    public void setShoulders(double pos) { //TODO: PRIVATISE!
+        shoulderRight.setPosition(pos);
+        shoulderLeft.setPosition(pos);
+    }
 
-    private void setWheelLeft(double power) {wheelLeft.setPower(power);}
+    public void spinWheelRight(double power) {wheelRight.setPower(power);} //TODO: Set to private
+
+    public void spinWheelLeft(double power) {wheelLeft.setPower(power);} //TODO: Set to private
+
+    public void spinWheels(double power) {
+        if (enableWheel) {
+            spinWheelRight(power);
+            spinWheelLeft(-power);
+        }
+    }
 
     public void spinToLock() {
         enableWheel = false;
     }
 
-    public void lockToRaise() {
-        setShoulderRight(SHOULDER_RIGHT_UP);
-        setShoulderLeft(SHOULDER_LEFT_UP);
-    }
+    public void lockToRaise() {setShoulders(SHOULDER_UP);}
 
     public void raiseToTransfer() {
-        setShoulderRight(SHOULDER_RIGHT_DOWN);
-        setShoulderLeft(SHOULDER_LEFT_DOWN);
         ee.rotateDown();
         new Thread(() -> {
             try {
@@ -73,47 +68,98 @@ public class Intake {
         }).start();
     }
 
+    public void transferToEject() {
+        new Thread(() -> {
+            try {
+                spinWheels(.6);
+                Thread.sleep(1000);
+                ee.rotateUp();
+                spinWheels(0);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
+    public void ejectToSpin() {
+        enableWheel = true;
+    }
 
-    IntakeState intakeState = IntakeState.SPIN;
+    public void ejectToTransfer() {
+        new Thread(() -> {
+            try {
+                ee.rotateDown();
+                Thread.sleep(1250);
+                spinWheels(-.6);
+                Thread.sleep(1000);
+                spinWheels(0);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public void transferToRaise() {
+        ee.open();
+    }
+
+    public void raiseToLock() {
+        enableWheel = false;
+        setShoulders(SHOULDER_DOWN);
+    }
+
+    public void lockToSpin() {
+        enableWheel = true;
+    }
+
+    public IntakeState currentState = IntakeState.SPIN;
 
     public void incrementState() {
-        switch (intakeState) {
+        switch (currentState) {
             case SPIN:
-                intakeState = IntakeState.LOCK;
+                spinToLock();
+                currentState = IntakeState.LOCK;
                 break;
             case LOCK:
-                intakeState = IntakeState.RAISE;
+                lockToRaise();
+                currentState = IntakeState.RAISE;
                 break;
             case RAISE:
-                intakeState = IntakeState.TRANSFER;
+                raiseToTransfer();
+                currentState = IntakeState.TRANSFER;
                 break;
             case TRANSFER:
-                intakeState = IntakeState.EJECT;
+                transferToEject();
+                currentState = IntakeState.EJECT;
                 break;
             case EJECT:
-                intakeState = IntakeState.SPIN;
+                ejectToSpin();
+                currentState = IntakeState.SPIN;
                 break;
         }
     }
 
     public void decrementState() {
-        switch (intakeState) {
-            case SPIN:
-                intakeState = IntakeState.EJECT;
-                break;
+        switch (currentState) {
             case LOCK:
-                intakeState = IntakeState.SPIN;
+                lockToSpin();
+                currentState = IntakeState.SPIN;
                 break;
             case RAISE:
-                intakeState = IntakeState.LOCK;
+                raiseToLock();
+                currentState = IntakeState.LOCK;
                 break;
             case TRANSFER:
-                intakeState = IntakeState.RAISE;
+                transferToRaise();
+                currentState = IntakeState.RAISE;
                 break;
             case EJECT:
-                intakeState = IntakeState.TRANSFER;
+                ejectToTransfer();
+                currentState = IntakeState.TRANSFER;
                 break;
+            default:
+                break;
+
         }
     }
 }

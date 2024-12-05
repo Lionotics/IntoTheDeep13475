@@ -11,53 +11,48 @@ import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.helpers.GamepadEx;
 
-@Config
 @TeleOp(name="Intake Testing", group="Testing")
 public class IntakeTesting extends LinearOpMode {
-    public static double SHOULDER_PRESS = 0, SHOULDER_RELEASE = 0;
-    public static double ELBOW_PRESS = 0, ELBOW_RELEASE = 0;
-    public static double WRIST_PRESS = 0, WRIST_RELEASE = 0;
-    public static double CLAW_PRESS = 0, CLAW_RELEASE = 0;
     Robot robot = Robot.getInstance();
+    GamepadEx gp1 = new GamepadEx();
     @Override
     public void runOpMode(){
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         robot.init(hardwareMap);
+
         waitForStart();
-        while(opModeIsActive()){
+
+        while (opModeIsActive()) {
+            if (gamepad1.right_trigger > 0.3) {
+                robot.intake.spinWheels(gamepad1.right_trigger);
+            } else if (gamepad1.left_trigger > 0.3) {
+                robot.intake.spinWheels(-gamepad1.left_trigger);
+            } else {
+                robot.intake.spinWheels(0);
+            }
+
+            if (gp1.rightBumper.isNewlyPressed()) {
+                robot.intake.incrementState();
+            } else if (gp1.leftBumper.isNewlyPressed()) {
+                robot.intake.decrementState();
+            }
 
             if (gamepad1.a) {
-                robot.intake.setClaw(CLAW_PRESS);
-            } else {
-                robot.intake.setClaw(CLAW_RELEASE);
-            }
-            if (gamepad1.b) {
-                robot.intake.setElbow(ELBOW_PRESS);
-            } else {
-                robot.intake.setElbow(ELBOW_RELEASE);
-            }
-            if (gamepad1.x) {
-                robot.intake.setWrist(WRIST_PRESS);
-            } else {
-                robot.intake.setWrist(WRIST_RELEASE);
-            }
-            if (gamepad1.y) {
-                robot.intake.setShoulder(SHOULDER_PRESS);
-            } else {
-                robot.intake.setShoulder(SHOULDER_RELEASE);
+                robot.intake.setShoulders(Intake.SHOULDER_UP);
+            } else if (gamepad1.b) {
+                robot.intake.setShoulders(Intake.SHOULDER_DOWN);
             }
 
-            if (gamepad1.dpad_left) {
-                robot.slides.horizontalSlide(.2);
-            } else if (gamepad1.dpad_right) {
-                robot.slides.horizontalSlide(.2);
-            }
-
-            telemetry.addData("Claw Position", robot.intake.getClawPosition());
-            telemetry.addData("Elbow Position", robot.intake.getElbowPosition());
-            telemetry.addData("Wrist Position", robot.intake.getWristPosition());
-            telemetry.addData("Shoulder Position", robot.intake.getShoulderPosition());
+            telemetry.addData("Right Shoulder Position", robot.intake.getShoulderRightPosition());
+            telemetry.addData("Left Shoulder Position", robot.intake.getShoulderLeftPosition());
+            telemetry.addData("Current State", robot.intake.currentState.name());
+            telemetry.addData("Wheels Speed:", (gamepad1.right_trigger > 0.3) ?
+                    gamepad1.right_trigger : ( (gamepad1.left_trigger > 0.3) ?
+                    -gamepad1.left_trigger : 0));
             telemetry.update();
+
+            gp1.update(gamepad1);
         }
     }
 }

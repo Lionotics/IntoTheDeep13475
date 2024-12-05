@@ -47,7 +47,7 @@ public class SlidesTesting extends LinearOpMode {
             if (isEitherLeft()) {
                 robot.slides.horizontalSlide(0.5);
             } else if (isEitherRight()) {
-                robot.slides.horizontalSlide(0.5);
+                robot.slides.horizontalSlide(-0.5);
             }
 
             if (gp2.dpad_up.isCurrentlyPressed()) {

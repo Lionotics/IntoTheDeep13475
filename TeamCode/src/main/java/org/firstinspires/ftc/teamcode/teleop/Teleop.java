@@ -22,7 +22,6 @@ public class Teleop extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         robot.init(hardwareMap);
-        robot.intake.init(); //TODO: Add at the end of auton, remove this later
         while (opModeIsActive()) {
             telemetry.addData("Press dpad up (on gp2) to move the vertical slides up", "");
             telemetry.addData("Press dpad down (on gp2) to move the vertical slides down", "");
@@ -35,10 +34,12 @@ public class Teleop extends LinearOpMode {
                 robot.intake.decrementState();
             }
 
-            if (gp1.x.isNewlyPressed()) {
-                robot.intake.turnWristRight();
-            } else if (gp1.b.isNewlyPressed()) {
-                robot.intake.turnWristLeft();
+            if (gamepad1.right_trigger > 0.3) {
+                robot.intake.spinWheels(gamepad1.right_trigger);
+            } else if (gamepad1.left_trigger > 0.3) {
+                robot.intake.spinWheels(-gamepad1.left_trigger);
+            } else {
+                robot.intake.spinWheels(0);
             }
 
             if (gp1.a.isNewlyPressed()) {
@@ -84,6 +85,9 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Vertical Target", robot.slides.getTargetPos());
             telemetry.addData("Vertical Velocity", robot.slides.getVerticalVelo());
             telemetry.addData("PID Output", robot.slides.getPidPower());
+            telemetry.addData("Wheels Speed:", (gamepad1.right_trigger > 0.3) ?
+                    gamepad1.right_trigger : ( (gamepad1.left_trigger > 0.3) ?
+                    -gamepad1.left_trigger : 0));
             telemetry.update();
 
             robot.driveTrain.driveRobotCentric(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
