@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.hardware.EndEffector;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.helpers.GamepadEx;
 
@@ -25,9 +26,9 @@ public class EndEffectorTesting extends LinearOpMode {
             } else if (gamepad1.b) {
                 robot.ee.rotateDown();
             } else if (gamepad1.x) {
-                robot.ee.openClaw();
+                robot.ee.open();
             } else if (gamepad1.y) {
-                robot.ee.closeClaw();
+                robot.ee.close();
             }
             telemetry.addData("EE Claw Position", robot.ee.getClawPosition());
             telemetry.addData("EE Wrist Position", robot.ee.getWristPosition());

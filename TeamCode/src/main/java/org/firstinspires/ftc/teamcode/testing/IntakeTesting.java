@@ -32,11 +32,11 @@ public class IntakeTesting extends LinearOpMode {
                 robot.intake.spinWheels(0);
             }
 
-            if (gp1.rightBumper.isNewlyPressed()) {
-                robot.intake.incrementState();
-            } else if (gp1.leftBumper.isNewlyPressed()) {
-                robot.intake.decrementState();
-            }
+//            if (gp1.rightBumper.isNewlyPressed()) {
+//                robot.intake.incrementState();
+//            } else if (gp1.leftBumper.isNewlyPressed()) {
+//                robot.intake.decrementState();
+//            }
 
             if (gamepad1.a) {
                 robot.intake.setShoulders(Intake.SHOULDER_UP);
@@ -46,7 +46,7 @@ public class IntakeTesting extends LinearOpMode {
 
             telemetry.addData("Right Shoulder Position", robot.intake.getShoulderRightPosition());
             telemetry.addData("Left Shoulder Position", robot.intake.getShoulderLeftPosition());
-            telemetry.addData("Current State", robot.intake.currentState.name());
+//            telemetry.addData("Current State", robot.intake.currentState.name());
             telemetry.addData("Wheels Speed:", (gamepad1.right_trigger > 0.3) ?
                     gamepad1.right_trigger : ( (gamepad1.left_trigger > 0.3) ?
                     -gamepad1.left_trigger : 0));
