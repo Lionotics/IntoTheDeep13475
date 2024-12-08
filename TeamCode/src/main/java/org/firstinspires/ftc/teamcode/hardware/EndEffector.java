@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class EndEffector {
 
-    public static double CLAW_CLOSE = .35, CLAW_OPEN = 0.6;
-    public static double ROTATE_UP = .2, ROTATE_DOWN = .75;
+    public static double CLAW_CLOSE = 0.35, CLAW_OPEN = 0.45;
+    public static double ROTATE_UP = 0, ROTATE_DOWN = .75;
 
     Servo claw, wrist;
     public static boolean clawOpen, wristUp;

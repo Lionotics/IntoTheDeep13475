@@ -38,44 +38,44 @@ public class Teleop extends LinearOpMode {
                 robot.intake.spinWheels(0);
             }
 
-            if (gp1.x.isNewlyPressed()) {
+            if (gp2.a.isNewlyPressed()) {
                 robot.ee.toggleClaw();
             }
 
-            if (gp1.y.isNewlyPressed()) {
+            if (gp2.x.isNewlyPressed()) {
                 robot.ee.toggleWrist();
             }
 
-            if (gp1.a.isNewlyPressed()) {
+            if (gp1.x.isNewlyPressed()) {
                robot.intake.toggleShoulder();
             }
 
-            if (gp2.dpad_left.isCurrentlyPressed() || gp1.dpad_left.isCurrentlyPressed()) {
-                robot.slides.horizontalSlide(-.5);
-            } else if (gp2.dpad_right.isCurrentlyPressed() || gp1.dpad_right.isCurrentlyPressed()) {
+            if (gp1.dpad_up.isCurrentlyPressed()) {
                 robot.slides.horizontalSlide(.5);
+            } else if (gp1.dpad_down.isCurrentlyPressed()) {
+                robot.slides.horizontalSlide(-.5);
             }
 
-            if (gp2.dpad_up.isCurrentlyPressed() || gp1.dpad_up.isCurrentlyPressed()) {
+            if (gp2.dpad_up.isCurrentlyPressed()) {
                 robot.slides.manualUp();
-            } else if (gp2.dpad_down.isCurrentlyPressed() || gp1.dpad_down.isCurrentlyPressed()) {
+            } else if (gp2.dpad_down.isCurrentlyPressed() ) {
                 telemetry.clear();
                 robot.slides.manualDown();
             }
 
-            if (gp2.y.isNewlyPressed()) {
-                robot.slides.moveToPosition(Slides.LiftPositions.TOP_BUCKET);
-            } else if (gp2.x.isNewlyPressed()) {
-                robot.slides.moveToPosition(Slides.LiftPositions.BOTTOM_BUCKET);
-            } else if (gp2.b.isNewlyPressed()) {
-                robot.slides.moveToPosition(Slides.LiftPositions.TOP_BAR);
-            } else if (gp2.a.isNewlyPressed()) {
-                robot.slides.moveToPosition(Slides.LiftPositions.BOTTOM);
-            } // else if (gp2.back.isNewlyPressed()) {
-            // robot.slides.moveToPosition(Slides.LiftPositions.TOP_HANG);
-            // }
+//            if (gp2.y.isNewlyPressed()) {
+//                robot.slides.moveToPosition(Slides.LiftPositions.TOP_BUCKET);
+//            } else if (gp2.x.isNewlyPressed()) {
+//                robot.slides.moveToPosition(Slides.LiftPositions.BOTTOM_BUCKET);
+//            } else if (gp2.b.isNewlyPressed()) {
+//                robot.slides.moveToPosition(Slides.LiftPositions.TOP_BAR);
+//            } else if (gp2.a.isNewlyPressed()) {
+//                robot.slides.moveToPosition(Slides.LiftPositions.BOTTOM);
+//            } // else if (gp2.back.isNewlyPressed()) {
+//            // robot.slides.moveToPosition(Slides.LiftPositions.TOP_HANG);
+//            // }
 
-            if (!gp2.dpad_left.isCurrentlyPressed() && !gp2.dpad_right.isCurrentlyPressed() && !gp2.dpad_up.isCurrentlyPressed() && !gp2.dpad_down.isCurrentlyPressed() && !gp1.dpad_left.isCurrentlyPressed() && !gp1.dpad_right.isCurrentlyPressed() && !gp1.dpad_up.isCurrentlyPressed() && !gp1.dpad_down.isCurrentlyPressed() && !gp2.x.isCurrentlyPressed() && !gp2.y.isCurrentlyPressed() && !gp2.a.isCurrentlyPressed() && !gp2.b.isCurrentlyPressed() && !gp2.back.isCurrentlyPressed()) {
+            if (!gp2.dpad_up.isCurrentlyPressed() && !gp2.dpad_down.isCurrentlyPressed() && !gp1.dpad_up.isCurrentlyPressed() && !gp1.dpad_down.isCurrentlyPressed() && !gp2.x.isCurrentlyPressed() && !gp2.y.isCurrentlyPressed() && !gp2.a.isCurrentlyPressed() && !gp2.b.isCurrentlyPressed() && !gp2.back.isCurrentlyPressed()) {
                 robot.slides.hold();
             }
 
