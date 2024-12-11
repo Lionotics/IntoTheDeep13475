@@ -13,7 +13,7 @@ public class Intake {
     EndEffector ee;
 
 
-    public static double SHOULDER_UP = 0.4, SHOULDER_DOWN = 1;
+    public static double SHOULDER_UP = 0.41, SHOULDER_DOWN = 1;
     public boolean shoulderUp;
 
 

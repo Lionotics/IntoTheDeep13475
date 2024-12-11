@@ -30,10 +30,10 @@ public class Teleop extends LinearOpMode {
 //                robot.intake.decrementState();
 //            }
 
-            if (gamepad1.right_trigger > 0.3) {
-                robot.intake.spinWheels(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger > 0.3) {
-                robot.intake.spinWheels(-gamepad1.left_trigger);
+            if (gamepad2.right_trigger > 0.3) {
+                robot.intake.spinWheels(gamepad2.right_trigger);
+            } else if (gamepad2.left_trigger > 0.3) {
+                robot.intake.spinWheels(-gamepad2.left_trigger);
             } else {
                 robot.intake.spinWheels(0);
             }
@@ -46,14 +46,14 @@ public class Teleop extends LinearOpMode {
                 robot.ee.toggleWrist();
             }
 
-            if (gp1.x.isNewlyPressed()) {
+            if (gp2.b.isNewlyPressed()) {
                robot.intake.toggleShoulder();
             }
 
             if (gp1.dpad_up.isCurrentlyPressed()) {
-                robot.slides.horizontalSlide(.5);
-            } else if (gp1.dpad_down.isCurrentlyPressed()) {
                 robot.slides.horizontalSlide(-.5);
+            } else if (gp1.dpad_down.isCurrentlyPressed()) {
+                robot.slides.horizontalSlide(.5);
             }
 
             if (gp2.dpad_up.isCurrentlyPressed()) {
@@ -75,11 +75,8 @@ public class Teleop extends LinearOpMode {
 //            // robot.slides.moveToPosition(Slides.LiftPositions.TOP_HANG);
 //            // }
 
-            if (!gp2.dpad_up.isCurrentlyPressed() && !gp2.dpad_down.isCurrentlyPressed() && !gp1.dpad_up.isCurrentlyPressed() && !gp1.dpad_down.isCurrentlyPressed() && !gp2.x.isCurrentlyPressed() && !gp2.y.isCurrentlyPressed() && !gp2.a.isCurrentlyPressed() && !gp2.b.isCurrentlyPressed() && !gp2.back.isCurrentlyPressed()) {
-                robot.slides.hold();
-            }
-
             robot.slides.loop();
+
 
             telemetry.addData("Slide Mode", robot.slides.getLiftState().name());
             telemetry.addData("Horizontal Pos", robot.slides.getHorizontalPos());
@@ -96,6 +93,9 @@ public class Teleop extends LinearOpMode {
             gp1.update(gamepad1);
             gp2.update(gamepad2);
 
+            telemetry.addData("left_stick_y", gamepad1.left_stick_y);
+            telemetry.addData("left_stick_x", gamepad1.left_stick_x);
+            telemetry.addData("right_stick_x", gamepad1.right_stick_x);
 //            telemetry.addData("Index: ", robot.intake.currentState.name());
             telemetry.addData("Claw status:", EndEffector.clawOpen);
             telemetry.addData("Horizontal: ", robot.slides.getHorizontalPos());

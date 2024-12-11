@@ -30,12 +30,12 @@ public class DriveTrain {
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
         initIMU(hwMap);
     }
 
-    public void drive(double leftStickY, double leftStickX,
+    public double[] drive(double leftStickY, double leftStickX,
                       double rightStickX){
         double y = leftStickY; // Remember, Y stick value is reversed
         double x = -leftStickX;
@@ -56,6 +56,7 @@ public class DriveTrain {
         double backRightPower = (rotY + rotX - rx) / denominator;
 
         setPower(frontLeftPower * maxSpeed, frontRightPower * maxSpeed, backLeftPower * maxSpeed, backRightPower * maxSpeed);
+        return new double[] {frontLeftPower * maxSpeed, frontRightPower * maxSpeed, backLeftPower * maxSpeed,backRightPower * maxSpeed};
     }
 
     public void driveRobotCentric(double leftStickY, double leftStickX, double rightStickX) {
