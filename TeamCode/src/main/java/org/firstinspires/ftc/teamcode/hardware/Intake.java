@@ -1,159 +1,130 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 public class Intake {
 
-    Servo shoulderRight, shoulderLeft;
-    CRServo wheelRight, wheelLeft;
-    EndEffector ee;
+    public enum Consts {
+        CLAW_CLOSE(0.1), CLAW_OPEN(.6),
+        PIVOT_BARRIER(0.65), PIVOT_GRAB(0.95), PIVOT_TRANSFER(0),
+        ADJUSTER_UP(0.31), ADJUST_PIECE(0);
 
+        public final double pos;
 
-    public static double SHOULDER_UP = 0.41, SHOULDER_DOWN = 1;
-    public boolean shoulderUp;
-
-
-    public enum IntakeState {
-        SPIN, LOCK, TRANSFER, EJECT
+        Consts(double pos) {
+            this.pos = pos;
+        }
     }
+
+    public Servo claw, pivot, adjuster;
 
     public void init(HardwareMap hwMap) {
-        shoulderRight = hwMap.get(Servo.class, "shoulderRight");
-        shoulderLeft = hwMap.get(Servo.class, "shoulderLeft");
-        wheelRight = hwMap.get(CRServo.class, "wheelRight");
-        wheelLeft = hwMap.get(CRServo.class, "wheelLeft");
-
-        ee = Robot.getInstance().ee;
-        setShoulders(SHOULDER_UP);
-        shoulderUp = true;
+        claw = hwMap.get(Servo.class, "intakeClaw"); // TODO: Get names
+        pivot = hwMap.get(Servo.class, "intakePivot");
+        adjuster = hwMap.get(Servo.class, "intakeAdjuster");
     }
 
-    public double getShoulderRightPosition() {return shoulderRight.getPosition();}
-
-    public double getShoulderLeftPosition() {return shoulderRight.getPosition();}
-
-    public void setShoulders(double pos) { //TODO: PRIVATISE!
-        shoulderRight.setPosition(pos);
-        shoulderLeft.setPosition(pos);
+    public void setClaw(Consts pos) {
+        claw.setPosition(pos.pos);
     }
 
-    public void spinWheelRight(double power) {wheelRight.setPower(power);} //TODO: Set to private
-
-    public void spinWheelLeft(double power) {wheelLeft.setPower(power);} //TODO: Set to private
-
-    public void spinWheels(double power) {
-        spinWheelRight(power);
-        spinWheelLeft(-power);
+    public void setPivot(Consts pos) {
+        pivot.setPosition(pos.pos);
     }
 
-    public void toggleShoulder() {
-        setShoulders((shoulderUp) ? SHOULDER_DOWN : SHOULDER_UP);
-        shoulderUp = !shoulderUp;
+    public void setAdjuster(Consts pos) {
+        adjuster.setPosition(pos.pos);
     }
 
-//    public void spinToLock() {
-//        enableWheel = false;
-//    }
-//
-//    public void lockToTransfer() {
-//        ee.rotateDown();
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            ee.close();
-//        }).start();
-//    }
-//
-//    public void transferToEject() {
-//        new Thread(() -> {
-//            try {
-//                enableWheel = true;
-//                spinWheels(-.6);
-//                Thread.sleep(1000);
-//                ee.rotateUp();
-//                spinWheels(0);
-//                enableWheel = false;
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
-//    }
-//
-//    public void ejectToSpin() {
-//        enableWheel = true;
-//    }
-//
-//    public void ejectToTransfer() {
-//        new Thread(() -> {
-//            try {
-//                ee.rotateDown();
-//                enableWheel = true;
-//                Thread.sleep(1250);
-//                spinWheels(.6);
-//                Thread.sleep(1000);
-//                spinWheels(0);
-//                enableWheel = false;
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-//    }
-//
-//    public void transferToLock() {
-//        ee.open();
-//    }
-//
-//    public void lockToSpin() {
-//        enableWheel = true;
-//    }
-//
-//    public IntakeState currentState = IntakeState.SPIN;
-//
-//    public void incrementState() {
-//        switch (currentState) {
-//            case SPIN:
-//                spinToLock();
-//                currentState = IntakeState.LOCK;
-//                break;
-//            case LOCK:
-//                lockToTransfer();
-//                currentState = IntakeState.TRANSFER;
-//                break;
-//            case TRANSFER:
-//                transferToEject();
-//                currentState = IntakeState.EJECT;
-//                break;
-//            case EJECT:
-//                ejectToSpin();
-//                currentState = IntakeState.SPIN;
-//                break;
-//        }
-//    }
-//
-//    public void decrementState() {
-//        switch (currentState) {
-//            case LOCK:
-//                lockToSpin();
-//                currentState = IntakeState.SPIN;
-//                break;
-//            case TRANSFER:
-//                transferToLock();
-//                currentState = IntakeState.LOCK;
-//                break;
-//            case EJECT:
-//                ejectToTransfer();
-//                currentState = IntakeState.TRANSFER;
-//                break;
-//            default:
-//                break;
-//
-//        }
-//    }
+
+   /* public Action openClaw() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setClaw(CLAW_OPEN);
+                packet.put("Claw State", "Open");
+                return false;
+            }
+        };
+    }
+
+    public Action closeClaw() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setClaw(CLAW_CLOSE);
+                packet.put("Claw State", "Open");
+                return false;
+            }
+        };
+    }
+
+    public Action transferWrist() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setWrist(WRIST_UP);
+                packet.put("Wrist State", "Transfer");
+                return false;
+            }
+        };
+    }
+
+    public Action sideWrist() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setWrist(WRIST_DOWN);
+                packet.put("Wrist State", "Sideways");
+                return false;
+            }
+        };
+    }
+    public Action transferPivot() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setPivot(PIVOT_TRANSFER);
+                packet.put("Wrist State", "Transfer");
+                return false;
+            }
+        };
+    }
+
+    public Action grabPivot() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setPivot(PIVOT_TRANSFER);
+                packet.put("Wrist State", "Down");
+                return false;
+            }
+        };
+    }
+
+    public Action barrierPivot() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                setPivot(PIVOT_BARRIER);
+                packet.put("Wrist State", "Down");
+                return false;
+            }
+        };
+    }*/
+
+    public double clawPos() {
+        return claw.getPosition();
+    }
+
+    public double adjusterPos() {
+        return adjuster.getPosition();
+    }
+
+    public double pivotPos() {
+        return pivot.getPosition();
+    }
 }
